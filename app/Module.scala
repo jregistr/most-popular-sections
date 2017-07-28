@@ -1,4 +1,5 @@
 import com.google.inject.AbstractModule
+import services.{CategoryQuery, CategoryQueryOverRest, ConfigSettingsLoader, SettingsLoader}
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -13,6 +14,8 @@ import com.google.inject.AbstractModule
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
+    bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader])
+    bind(classOf[CategoryQuery]).to(classOf[CategoryQueryOverRest]).asEagerSingleton()
 /*    // Use the system clock as the default implementation of Clock
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
     // Ask Guice to create an instance of ApplicationTimer when the
