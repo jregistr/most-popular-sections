@@ -1,15 +1,10 @@
 package services
 
-import java.util
 import javax.inject.Inject
 
 import models.{AppearanceCount, Section}
 
-import scala.collection.immutable.{SortedSet, TreeSet}
-
-//import scala.collection.SortedMap
-import scala.collection.immutable.TreeMap
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SectionsRanker {
 
@@ -43,16 +38,5 @@ class MostPopularSectionsRanker @Inject()(categoryQuery: CategoryQuery,
       }).sorted.reverse.take(limit)
     })
 
-    //    countsQuery(Constants.URL_MOST_VIEWED).flatMap(viewed =>
-    //      countsQuery(Constants.URL_MOST_SHARED).flatMap(shared =>
-    //        countsQuery(Constants.URL_MOST_MAILED).map(mailed => {
-    //          sections.foldLeft(List[Section]())((list, sectionName) => {
-    //            val vCount = viewed.getOrElse(sectionName, 0)
-    //            val sCount = shared.getOrElse(sectionName, 0)
-    //            val mCount = mailed.getOrElse(sectionName, 0)
-    //            val appearanceCount = AppearanceCount(sCount, vCount, mCount)
-    //            list :+ Section(sectionName, appearanceCount)
-    //          }).sorted.reverse.take(limit)
-    //        })))
   }
 }
