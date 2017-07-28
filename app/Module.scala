@@ -14,15 +14,8 @@ import services.{CategoryQuery, CategoryQueryOverRest, ConfigSettingsLoader, Set
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
-    bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader])
+    bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader]).asEagerSingleton()
     bind(classOf[CategoryQuery]).to(classOf[CategoryQueryOverRest]).asEagerSingleton()
-/*    // Use the system clock as the default implementation of Clock
-    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
-    // Ask Guice to create an instance of ApplicationTimer when the
-    // application starts.
-    bind(classOf[ApplicationTimer]).asEagerSingleton()
-    // Set AtomicCounter as the implementation for Counter.
-    bind(classOf[Counter]).to(classOf[AtomicCounter])*/
   }
 
 }

@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.libs.json._
 import play.api.mvc._
-import services.CategoryQuery
+import services.{CategoryQuery, Constants}
 
 import scala.concurrent.ExecutionContext
 
@@ -13,7 +13,7 @@ class ApiController @Inject()(cc: ControllerComponents, categoryQuery: CategoryQ
                              (implicit defaultContext: ExecutionContext) extends AbstractController(cc) {
 
   def mostPopular: Action[AnyContent] = Action.async {
-    categoryQuery.getCountsInCategory(7)("https://api.nytimes.com/svc/mostpopular/v2/mostviewed")
+    categoryQuery.getCountsInCategory(7)(Constants.URL_MOST_VIEWED)
       .map((mapped: Map[String, Int]) => {
         val t = mapped.map {case (section, count) =>
           JsObject(Seq(
