@@ -48,6 +48,7 @@ _errored_
 ```json
 {
   "success" : false,
-  "message" : "Invalid parameter set"
+  "status" : 400,
+  "error" : {} | ""
 }
 ```
