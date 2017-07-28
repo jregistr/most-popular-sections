@@ -2,16 +2,18 @@ package services
 
 import javax.inject.Inject
 
+import play.api.Logger
 import play.api.http.Status.OK
 import play.api.libs.ws.WSClient
 
+import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 trait CategoryQuery {
 
   protected val settingsRepo: ConfigSettingsLoader
 
-  def getCountsInCategory(timePeriod: Int)(apiBase: String): Future[Map[String, Int]]
+  def getCountsInCategory(sections: Seq[String], timePeriod: Int)(apiBase: String): Future[Map[String, Int]]
 
   protected def getCountForCategory(section: String, apiBase: String, timePeriod: Int): Future[(String, Int)]
 
@@ -24,8 +26,9 @@ class CategoryQueryOverRest @Inject()(override protected val settingsRepo: Confi
                                      (private implicit val executionContext: ExecutionContext)
   extends CategoryQuery {
 
-  override def getCountsInCategory(timePeriod: Int)(apiBase: String): Future[Map[String, Int]] = {
-    val sections = settingsRepo.sections.get()
+  private val logger = Logger(getClass)
+
+  override def getCountsInCategory(sections: Seq[String], timePeriod: Int)(apiBase: String): Future[Map[String, Int]] = {
     val allCounts = Future.sequence(sections.map(section => {
       getCountForCategory(section, apiBase, timePeriod)
     }))
@@ -35,7 +38,9 @@ class CategoryQueryOverRest @Inject()(override protected val settingsRepo: Confi
   override protected def getCountForCategory(section: String, apiBase: String,
                                              timePeriod: Int): Future[(String, Int)] = {
     val queryUrl = mkUrl(apiBase, section, timePeriod)
-    ws.url(queryUrl).get().map(response => {
+    ws.url(queryUrl)
+      .withRequestTimeout(15 seconds)
+      .get().map(response => {
       response.status match {
         case OK =>
           val json = response.json
@@ -47,7 +52,11 @@ class CategoryQueryOverRest @Inject()(override protected val settingsRepo: Confi
           }
         case _ => section -> 0
       }
-    })
+    }).recover {
+      case t =>
+        logger.error(s"Failed to get count for category: $section with API: $apiBase. Returning default", t)
+        section -> 0
+    }
   }
 
 }

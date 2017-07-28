@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule
-import services.{CategoryQuery, CategoryQueryOverRest, ConfigSettingsLoader, SettingsLoader}
+import services._
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -15,7 +15,10 @@ class Module extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader]).asEagerSingleton()
-    bind(classOf[CategoryQuery]).to(classOf[CategoryQueryOverRest]).asEagerSingleton()
+    bind(classOf[SectionsLoader]).to(classOf[QueryingSectionsLoader]).asEagerSingleton()
+
+    bind(classOf[CategoryQuery]).to(classOf[CategoryQueryOverRest])
+    bind(classOf[SectionsRanker]).to(classOf[MostPopularSectionsRanker])
   }
 
 }

@@ -9,7 +9,10 @@ object Constants {
 
   val URL_MOST_VIEWED = "https://api.nytimes.com/svc/mostpopular/v2/mostviewed"
 
-  val NAME_QUERY_CONTEXT = "api-query-dispatcher"
+  val URL_MOST_MAILED = "https://api.nytimes.com/svc/mostpopular/v2/mostemailed"
 
+  val URL_MOST_SHARED = "https://api.nytimes.com/svc/mostpopular/v2/mostshared"
+
+  val NAME_QUERY_CONTEXT = "api-query-dispatcher"
 
 }
