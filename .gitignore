@@ -121,5 +121,3 @@ project/plugins/project/
 # End of https://www.gitignore.io/api/sbt,macos,linux,scala,intellij+all
 
 application.conf
-
-sbt-dist
