@@ -9,9 +9,9 @@ import play.api.http.Status.OK
 import play.api.libs.json.{JsArray, JsValue}
 import play.api.libs.ws.{WSClient, WSResponse}
 
+import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import scala.concurrent.duration._
 
 /**
   * Entity to load and hold the NY times sections.
@@ -35,9 +35,10 @@ class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
                                        private val system: ActorSystem,
                                        private val defaultContext: ExecutionContext) extends SectionsLoader {
 
+  override var sections: AtomicReference[Seq[String]] = new AtomicReference[Seq[String]]()
+
   private val queryContext = system.dispatchers.lookup(Constants.NAME_QUERY_CONTEXT)
   private val logger = Logger(getClass)
-  override var sections: AtomicReference[Seq[String]] = new AtomicReference[Seq[String]]()
 
   /**
     * Makes an Http request to the NY times api for the available list of sections.
