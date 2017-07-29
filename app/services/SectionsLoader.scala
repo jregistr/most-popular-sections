@@ -13,12 +13,23 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 
+/**
+  * Entity to load and hold the NY times sections.
+  */
 trait SectionsLoader {
 
   var sections: AtomicReference[Seq[String]]
 
 }
 
+/**
+  * An implementation that gathers data by querying the API.
+  *
+  * @param settingsRepo   - A dependency on the settings repository.
+  * @param ws             - Play's web service client to use to request data over http.
+  * @param system         - The actor system to use to load from the API.
+  * @param defaultContext - The default execution context.
+  */
 class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
                                        private val ws: WSClient,
                                        private val system: ActorSystem,
