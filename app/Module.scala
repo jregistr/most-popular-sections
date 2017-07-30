@@ -1,5 +1,6 @@
 import com.google.inject.AbstractModule
 import services._
+import play.api.libs.concurrent.AkkaGuiceSupport
 
 /**
   * This class is a Guice module that tells Guice how to bind several
@@ -11,14 +12,15 @@ import services._
   * adding `play.modules.enabled` settings to the `application.conf`
   * configuration file.
   */
-class Module extends AbstractModule {
+class Module extends AbstractModule with AkkaGuiceSupport {
 
   override def configure(): Unit = {
-    bind(classOf[SectionsLoader]).to(classOf[QueryingSectionsLoader]).asEagerSingleton()
     bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader]).asEagerSingleton()
+//    bind(classOf[SectionsLoaderOld]).to(classOf[QueryingSectionsLoaderOld]).asEagerSingleton()
 
     bind(classOf[CategoryQuery]).to(classOf[PerSectionCategoryQuery])
     bind(classOf[SectionsRanker]).to(classOf[MostPopularSectionsRanker])
+    bindActor[SectionsLoaderActor]("Sections-Loader")
   }
 
 }

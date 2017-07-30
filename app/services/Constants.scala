@@ -5,7 +5,7 @@ package services
   */
 object Constants {
 
-  val URL_SECTIONS = "https://api.nytimes.com/svc/mostpopular/v2/viewed/sections.json"
+  val URL_SECTIONS = "http://api.nytimes.com/svc/mostpopular/v2/viewed/sections.json"
 
   val URL_MOST_VIEWED = "https://api.nytimes.com/svc/mostpopular/v2/mostviewed"
 
