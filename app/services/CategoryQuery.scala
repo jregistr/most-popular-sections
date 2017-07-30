@@ -10,6 +10,7 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
+
 /**
   * Defines the shape of an object that calculates section view counts for a given category.
   */
@@ -27,16 +28,6 @@ trait CategoryQuery {
     */
   def getCountsInCategory(sections: Seq[String], timePeriod: Int)(apiBase: String): Future[Map[String, Int]]
 
-  /**
-    * For a given sections, finds the appearance count.
-    *
-    * @param section    - The section to find appearance count data for.
-    * @param apiBase    - The url for the category.
-    * @param timePeriod - The time period.
-    * @return - A tuple pairing the given section with its appearance count.
-    */
-  protected def getCountForCategory(section: String, apiBase: String, timePeriod: Int): Future[(String, Int)]
-
 }
 
 /**
@@ -46,11 +37,9 @@ trait CategoryQuery {
   * @param ws           - A dependency on play's webservice for performing requests.
   * @param system       - A dependency on the actor system for loading a dispatcher.
   */
-class CategoryQueryOverRest @Inject()(override protected val settingsRepo: ConfigSettingsLoader,
-                                      private val ws: WSClient,
-                                      system: ActorSystem)
-
-  extends CategoryQuery {
+class PerSectionCategoryQuery @Inject()(override protected val settingsRepo: ConfigSettingsLoader,
+                                        private val ws: WSClient,
+                                        system: ActorSystem) extends CategoryQuery {
 
   private implicit val queryContext = system.dispatchers.lookup(Constants.NAME_QUERY_CONTEXT)
   private val logger = Logger(getClass)
@@ -72,10 +61,10 @@ class CategoryQueryOverRest @Inject()(override protected val settingsRepo: Confi
     * Queries for the appearance count of a given section. Defaults to 0 for the appearance count if no output was
     * returned or an error occurred.
     *
-    * @see [[CategoryQuery.getCountForCategory()]]
+    *
     */
-  override protected def getCountForCategory(section: String, apiBase: String,
-                                             timePeriod: Int): Future[(String, Int)] = {
+  private def getCountForCategory(section: String, apiBase: String,
+                                  timePeriod: Int): Future[(String, Int)] = {
     val queryUrl = mkUrl(apiBase, section, timePeriod)
     ws.url(queryUrl)
       .withRequestTimeout(15.seconds) //15 second timeout
@@ -83,12 +72,8 @@ class CategoryQueryOverRest @Inject()(override protected val settingsRepo: Confi
       response.status match {
         case OK =>
           val json = response.json
-          if ((json \ "status").as[String] == "OK") {
-            val count = (json \ "num_results").as[Int]
-            section -> count
-          } else {
-            section -> 0
-          }
+          val count = (json \ "num_results").as[Int]
+          section -> count
         case _ => section -> 0
       }
     }).recover {

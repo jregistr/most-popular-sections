@@ -1,11 +1,12 @@
 package services
 
 import java.util.concurrent.atomic.AtomicReference
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Cancellable}
 import play.api.Logger
 import play.api.http.Status.OK
+import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.{JsArray, JsValue}
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -29,11 +30,14 @@ trait SectionsLoader {
   * @param ws             - Play's web service client to use to request data over http.
   * @param system         - The actor system to use to load from the API.
   * @param defaultContext - The default execution context.
+  * @param lifecycle      - Dependency on lifecycle to shutdown scheduled task
   */
+@Singleton
 class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
                                        private val ws: WSClient,
                                        private val system: ActorSystem,
-                                       private val defaultContext: ExecutionContext) extends SectionsLoader {
+                                       private val lifecycle: ApplicationLifecycle)
+                                      (implicit private val defaultContext: ExecutionContext) extends SectionsLoader {
 
   override var sections: AtomicReference[Seq[String]] = new AtomicReference[Seq[String]]()
 
@@ -69,8 +73,8 @@ class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
   //If we fail to get the list, exit the application
   Await.ready(querySections, 45 seconds).onComplete {
     case Success(response) =>
-      (response.status, response.json) match {
-        case (OK, json) if (json \ "status").as[String] == "OK" => setSectionsFromJson(json)
+      response.status match {
+        case OK => setSectionsFromJson(response.json)
         case _ =>
           logger.error(s"Received response code ${response.status} from query.")
           logger.error(s"Body of response was ${response.body}")
@@ -80,18 +84,24 @@ class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
     case Failure(t) =>
       logger.error("Unable to retrieve initial list of sections. Shuting down", t)
       System.exit(1)
-  }(defaultContext)
+  }
 
-  //Schedule updating the section list once every 24 hours
-  system.scheduler.schedule(24 hours, 24 hours, () => {
-    querySections.map(response => {
-      (response.status, response.json) match {
-        case (OK, json) if (json \ "status").as[String] == "OK" => setSectionsFromJson(json)
-        case _ =>
-          logger.warn("Did not update list of sections")
-      }
-    })(queryContext)
-  })(defaultContext)
+  val sectionUpdates: Cancellable = system.scheduler.schedule(24 hours, 24 hours) {
+    Future {
+      querySections.map(response => {
+        response.status match {
+          case OK => setSectionsFromJson(response.json)
+          case _ =>
+            logger.warn("Did not update list of sections")
+        }
+      })(queryContext)
+    }
+  }
+
+  lifecycle.addStopHook(() => {
+    sectionUpdates.cancel()
+    Await.ready(system.terminate(), 45 seconds)
+  })
 
 }
 
