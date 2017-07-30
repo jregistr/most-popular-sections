@@ -9,9 +9,7 @@ import play.api.Configuration
   */
 trait SettingsLoader {
 
-  case class UpdateSectionsDelay(initial: Int, repeating: Int)
-
-  case class Settings(apiKey: String, updateDelays: UpdateSectionsDelay)
+  case class Settings(apiKey: String)
 
   val settings: Settings
 }
@@ -25,14 +23,9 @@ class ConfigSettingsLoader @Inject()(config: Configuration) extends SettingsLoad
   // loads settings from application.conf into Settings object.
   override val settings: Settings = {
     val nyTimesConfig: Configuration = config.get[Configuration]("ny-times")
-    val delayConfig = config.get[Configuration]("sections-update-delay")
 
     val apiKey = nyTimesConfig.get[String]("api-key")
-
-    val initial = delayConfig.get[Option[Int]]("initial")
-    val repeat = delayConfig.get[Option[Int]]("repeating")
-
-    Settings(apiKey, UpdateSectionsDelay(initial.getOrElse(24), repeat.getOrElse(24)))
+    Settings(apiKey)
   }
 
 }
