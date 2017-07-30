@@ -1,17 +1,18 @@
 package services
 
 import java.util.concurrent.atomic.AtomicReference
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Provider, Singleton}
 
 import akka.actor.{ActorSystem, Cancellable}
-import play.api.{Application, Configuration, Logger}
 import play.api.http.Status.OK
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.{JsArray, JsValue}
 import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.{Application, Logger}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
 /**
@@ -36,7 +37,8 @@ trait SectionsLoader {
 class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
                                        private val ws: WSClient,
                                        private val system: ActorSystem,
-                                       private val lifecycle: ApplicationLifecycle)
+                                       private val lifecycle: ApplicationLifecycle,
+                                       app: Provider[Application])
                                       (implicit private val defaultContext: ExecutionContext) extends SectionsLoader {
 
   override var sections: AtomicReference[Seq[String]] = new AtomicReference[Seq[String]]()
@@ -79,11 +81,11 @@ class QueryingSectionsLoader @Inject()(private val settingsRepo: SettingsLoader,
           logger.error(s"Received response code ${response.status} from query.")
           logger.error(s"Body of response was ${response.body}")
           logger.error("System is exiting")
-          System.exit(1)
+          app.get().stop()
       }
     case Failure(t) =>
-      logger.error("Unable to retrieve initial list of sections. Shuting down", t)
-      System.exit(1)
+      logger.error("Unable to retrieve initial list of sections. Shutting down", t)
+      app.get().stop()
   }
 
   val sectionUpdates: Cancellable = system.scheduler.schedule(24 hours, 24 hours) {
