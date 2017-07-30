@@ -16,11 +16,10 @@ class Module extends AbstractModule with AkkaGuiceSupport {
 
   override def configure(): Unit = {
     bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader]).asEagerSingleton()
-//    bind(classOf[SectionsLoaderOld]).to(classOf[QueryingSectionsLoaderOld]).asEagerSingleton()
+    bind(classOf[SectionsLoader]).to(classOf[QueryingSectionsLoader]).asEagerSingleton()
 
     bind(classOf[CategoryQuery]).to(classOf[PerSectionCategoryQuery])
     bind(classOf[SectionsRanker]).to(classOf[MostPopularSectionsRanker])
-    bindActor[SectionsLoaderActor]("Sections-Loader")
   }
 
 }
