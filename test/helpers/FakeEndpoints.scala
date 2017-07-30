@@ -9,22 +9,29 @@ import services.Constants
 
 trait FakeEndpoints extends FakeDataProvider {
 
+  val expectedApiKey = "Thisistheexpectedapikeythatshouldbesetforallrequests"
   private val errors = Seq("Bad Request")
 
   val sectionsEndPointGood: Routes = {
-    case (GET, Constants.URL_SECTIONS) => Action {
+    case (GET, Constants.URL_SECTIONS) => Action { request =>
+      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
+        BadRequest(erroredResponse(Seq("Missing api key")))
       Ok(sectionsResponse)
     }
   }
 
   val sectionsEndPointError: Routes = {
-    case (GET, Constants.URL_SECTIONS) => Action {
+    case (GET, Constants.URL_SECTIONS) => Action { request =>
+      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
+        BadRequest(erroredResponse(Seq("Missing api key")))
       BadRequest(erroredResponse(errors))
     }
   }
 
   def allSectionsEmptyForCategory(categoryBaseUrl: String): Routes = {
-    case (GET, `categoryBaseUrl`) => Action {
+    case (GET, `categoryBaseUrl`) => Action { request =>
+      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
+        BadRequest(erroredResponse(Seq("Missing api key")))
       Ok(emptySectionsResponse)
     }
   }
@@ -45,7 +52,9 @@ trait FakeEndpoints extends FakeDataProvider {
   }
 
   private def mOkCategoryEndPoint(url: String, response: JsObject): Routes = {
-    case (GET, `url`) => Action {
+    case (GET, `url`) => Action { request =>
+      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
+        BadRequest(erroredResponse(Seq("Missing api key")))
       Ok(response)
     }
   }

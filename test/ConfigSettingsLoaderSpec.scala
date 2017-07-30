@@ -12,7 +12,7 @@ class ConfigSettingsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with Fa
   "Config settings loader " should {
     "Load the correct values for NY times config" in {
 
-      val key = "Key should be set to this"
+      val key = expectedApiKey
 
       val fakeClient = MockWS(sectionsEndPointGood)
 

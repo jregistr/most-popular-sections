@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.{ActorSystem, Cancellable}
-import play.api.Logger
+import play.api.{Application, Configuration, Logger}
 import play.api.http.Status.OK
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.json.{JsArray, JsValue}
