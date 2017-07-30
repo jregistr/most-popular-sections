@@ -2,7 +2,7 @@ package helpers
 
 import mockws.MockWS.Routes
 import play.api.libs.json.JsObject
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent, Result}
 import play.api.mvc.Results._
 import play.api.test.Helpers._
 import services.Constants
@@ -10,30 +10,19 @@ import services.Constants
 trait FakeEndpoints extends FakeDataProvider {
 
   val expectedApiKey = "Thisistheexpectedapikeythatshouldbesetforallrequests"
+  private val missingKey = BadRequest(erroredResponse(Seq("Missing api key")))
   private val errors = Seq("Bad Request")
 
   val sectionsEndPointGood: Routes = {
-    case (GET, Constants.URL_SECTIONS) => Action { request =>
-      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
-        BadRequest(erroredResponse(Seq("Missing api key")))
-      Ok(sectionsResponse)
-    }
+    case (GET, Constants.URL_SECTIONS) => mkAction(Ok(sectionsResponse))
   }
 
   val sectionsEndPointError: Routes = {
-    case (GET, Constants.URL_SECTIONS) => Action { request =>
-      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
-        BadRequest(erroredResponse(Seq("Missing api key")))
-      BadRequest(erroredResponse(errors))
-    }
+    case (GET, Constants.URL_SECTIONS) => mkAction(BadRequest(erroredResponse(errors)))
   }
 
   def allSectionsEmptyForCategory(categoryBaseUrl: String): Routes = {
-    case (GET, `categoryBaseUrl`) => Action { request =>
-      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
-        BadRequest(erroredResponse(Seq("Missing api key")))
-      Ok(emptySectionsResponse)
-    }
+    case (GET, `categoryBaseUrl`) => mkAction(Ok(emptySectionsResponse))
   }
 
   def createCategoryEndPoints(base: String, period: Int, sectionAndCounts: List[(String, Int)]): Routes = {
@@ -51,16 +40,19 @@ trait FakeEndpoints extends FakeDataProvider {
     routes.reduceLeft(_ orElse _)
   }
 
-  private def mOkCategoryEndPoint(url: String, response: JsObject): Routes = {
-    case (GET, `url`) => Action { request =>
-      if (request.getQueryString("api-key").getOrElse("") != expectedApiKey)
-        BadRequest(erroredResponse(Seq("Missing api key")))
-      Ok(response)
-    }
-  }
-
   def mergeWithSectionsRoute(routes: Routes): Routes = sectionsEndPointGood orElse routes
 
-  def mkUrl(base: String, section: String, period: Int): String = s"$base/$section/$period.json"
+  private def mkUrl(base: String, section: String, period: Int): String = s"$base/$section/$period.json"
+
+  private def mOkCategoryEndPoint(url: String, response: JsObject): Routes = {
+    case (GET, `url`) => mkAction(Ok(response))
+  }
+
+  private def mkAction(positive: Result, negative: Result = missingKey): Action[AnyContent] = Action { request =>
+    request.getQueryString("api-key").map(_ == expectedApiKey) match {
+      case Some(true) => positive
+      case _ => negative
+    }
+  }
 
 }

@@ -9,14 +9,14 @@ import services.SectionsLoader
 
 class QueryingSectionsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndpoints {
 
-  "When properly configured" should {
-    "Get the sections" in {
-      val ws = MockWS(sectionsEndPointGood)
-      val application = new GuiceApplicationBuilder()
-        .configure("ny-times.api-key" -> expectedApiKey)
-        .overrides(bind[WSClient].toInstance(ws))
-        .build()
+  "When properly configured, loader" should {
+    val ws = MockWS(sectionsEndPointGood)
+    val application = new GuiceApplicationBuilder()
+      .configure("ny-times.api-key" -> expectedApiKey)
+      .overrides(bind[WSClient].toInstance(ws))
+      .build()
 
+    "Get the sections" in {
       val sectionLoader = application.injector.instanceOf(classOf[SectionsLoader])
       val loadedSections = sectionLoader.sections.get()
 
@@ -25,4 +25,20 @@ class QueryingSectionsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with 
       check must be(true)
     }
   }
+
+  "When an unexpected API key is sent, loader" should {
+    val ws = MockWS(sectionsEndPointGood)
+    val app = new GuiceApplicationBuilder()
+      .configure("ny-times.api-key" -> "Some key that is not expected")
+      .overrides(bind[WSClient].toInstance(ws))
+      .build()
+
+    "not have any sections" in {
+      val sectionLoader = app.injector.instanceOf(classOf[SectionsLoader])
+      sectionLoader.sections.get() must be(null)
+    }
+  }
+
+
+
 }
