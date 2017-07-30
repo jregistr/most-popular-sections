@@ -14,8 +14,8 @@ import services._
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
-    bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader]).asEagerSingleton()
     bind(classOf[SectionsLoader]).to(classOf[QueryingSectionsLoader]).asEagerSingleton()
+    bind(classOf[SettingsLoader]).to(classOf[ConfigSettingsLoader]).asEagerSingleton()
 
     bind(classOf[CategoryQuery]).to(classOf[CategoryQueryOverRest])
     bind(classOf[SectionsRanker]).to(classOf[MostPopularSectionsRanker])

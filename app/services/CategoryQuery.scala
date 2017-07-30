@@ -83,12 +83,8 @@ class CategoryQueryOverRest @Inject()(override protected val settingsRepo: Confi
       response.status match {
         case OK =>
           val json = response.json
-          if ((json \ "status").as[String] == "OK") {
-            val count = (json \ "num_results").as[Int]
-            section -> count
-          } else {
-            section -> 0
-          }
+          val count = (json \ "num_results").as[Int]
+          section -> count
         case _ => section -> 0
       }
     }).recover {
