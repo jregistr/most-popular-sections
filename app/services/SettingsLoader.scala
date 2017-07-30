@@ -2,7 +2,6 @@ package services
 
 import javax.inject.{Inject, Singleton}
 
-import com.typesafe.config.ConfigFactory
 import play.api.Configuration
 
 /**
