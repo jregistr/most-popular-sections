@@ -17,7 +17,7 @@ class SectionsRankerSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndp
 
   val mostViewed: List[(String, Int)] = makeSectionCountPairings(25, top)
   val mostShared: List[(String, Int)] = makeSectionCountPairings(15, top)
-  val mostEmailed: List[(String, Int)] = makeSectionCountPairings(5, top)
+  val mostEmailed: List[(String, Int)] = makeSectionCountPairings(7, top)
 
   val rest: List[(String, Int)] = makeSectionCountPairings(1, sectionsNames.splitAt(3)._2)
 
@@ -42,6 +42,10 @@ class SectionsRankerSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndp
 
       mostPopulars must have size 8
       mostPopulars.head.section must be("Climate")
+
+      mostPopulars.head.appearedIn.mostViewed must be(27)
+      mostPopulars.head.appearedIn.mostShared must be(17)
+      mostPopulars.head.appearedIn.mostEmailed must be(9)
     }
 
     "yield 11 when limit above maximum available is passed" in {
