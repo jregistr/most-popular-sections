@@ -2,10 +2,8 @@ package services
 
 import javax.inject.Inject
 
-import akka.util.Timeout
 import models.{AppearanceCount, Section}
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SectionsRanker {
@@ -17,7 +15,6 @@ trait SectionsRanker {
 class MostPopularSectionsRanker @Inject()(categoryQuery: CategoryQuery,
                                           sectionsLoader: SectionsLoader)
                                          (implicit val context: ExecutionContext) extends SectionsRanker {
-  implicit val timeout: Timeout = 5.seconds
 
   override def getMostPopularSections(limit: Int, timePeriod: Int): Future[Seq[Section]] = {
     val sections = sectionsLoader.sections.get()
