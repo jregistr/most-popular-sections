@@ -3,7 +3,7 @@ import mockws.MockWS
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.bind
+import play.api.inject.{ApplicationLifecycle, bind}
 import play.api.libs.ws.WSClient
 import services.SectionsLoader
 
@@ -26,6 +26,22 @@ class QueryingSectionsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with 
     }
   }
 
+  "when app is well configured and outside api returns empty, loader" should {
+    val ws = MockWS(sectionsEndPointEmpty)
+    val app = new GuiceApplicationBuilder()
+      .configure("ny-times.api-key" -> expectedApiKey)
+      .overrides(bind[WSClient].toInstance(ws))
+      .build()
+
+    "Should accept the empty list" in {
+      val sectionLoader = app.injector.instanceOf(classOf[SectionsLoader])
+      val lifeCycle = app.injector.instanceOf[ApplicationLifecycle]
+
+      val loadedSections = sectionLoader.sections.get()
+      loadedSections must be (empty)
+    }
+  }
+
   "When an unexpected API key is sent, loader" should {
     val ws = MockWS(sectionsEndPointGood)
     val app = new GuiceApplicationBuilder()
@@ -38,7 +54,5 @@ class QueryingSectionsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with 
       sectionLoader.sections.get() must be(null)
     }
   }
-
-
 
 }

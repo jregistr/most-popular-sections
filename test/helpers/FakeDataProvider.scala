@@ -7,17 +7,16 @@ import scala.util.Random
 
 trait FakeDataProvider {
   val sectionsNames: Seq[String] = List(
+    "Obituaries",
     "Automobiles",
     "Climate",
     "Education",
-    "Movies",
     "Science",
-
+    "Food",
+    "Opinion",
+    "Books",
     "Magazine",
     "Movies",
-    "Opinion",
-    "Science",
-    "Obituaries",
     "Sports"
   )
 
@@ -47,6 +46,12 @@ trait FakeDataProvider {
     "errors" -> JsArray(errors.map(e => JsString(e))),
     "results" -> JsArray()
   ))
+
+  def makeSectionCountPairings(start: Int, names: Seq[String]): List[(String, Int)] =
+    names.foldLeft(List[(String, Int)]())((list, name) => {
+      val next = if (list.isEmpty) start else list.last._2 + 1
+      list :+ name -> next
+    })
 
   private implicit def formatArrayResponse(array: JsArray): JsObject = formatArrayResponse(array, "OK")
 

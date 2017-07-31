@@ -17,6 +17,10 @@ trait FakeEndpoints extends FakeDataProvider {
     case (GET, Constants.URL_SECTIONS) => mkAction(Ok(sectionsResponse))
   }
 
+  val sectionsEndPointEmpty: Routes = {
+    case (GET, Constants.URL_SECTIONS) => mkAction(Ok(emptySectionsResponse))
+  }
+
   val sectionsEndPointError: Routes = {
     case (GET, Constants.URL_SECTIONS) => mkAction(BadRequest(erroredResponse(errors)))
   }
