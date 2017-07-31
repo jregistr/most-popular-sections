@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import helpers.FormattedJsonOutput
 import play.api.data.Forms._
 import play.api.data._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
