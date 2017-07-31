@@ -1,14 +1,13 @@
 package services
 
-import testinghelpers.FakeEndpoints
 import mockws.MockWS
 import org.scalatestplus.play._
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.{ApplicationLifecycle, bind}
 import play.api.libs.ws.WSClient
+import testinghelpers.FakeEndpoints
 
-class QueryingSectionsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndpoints {
+class QueryingSectionsLoaderSpec extends PlaySpec with FakeEndpoints {
 
   "When properly configured, loader" should {
     val ws = MockWS(sectionsEndPointGood)

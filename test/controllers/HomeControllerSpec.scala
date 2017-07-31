@@ -3,6 +3,7 @@ package controllers
 import mockws.MockWS
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.Application
 import play.api.http.MimeTypes.HTML
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -17,12 +18,6 @@ import scala.concurrent.Future
 class HomeControllerSpec extends PlaySpec with GuiceOneServerPerSuite with FakeEndpoints {
 
   "when app is launched and configured, visiting home" should {
-    val ws = MockWS(sectionsEndPointGood)
-    val app = new GuiceApplicationBuilder()
-      .configure("ny-times.api-key" -> expectedApiKey)
-      .overrides(bind[WSClient].toInstance(ws))
-      .build()
-
     "render an html view" in {
       val controller = app.injector.instanceOf[HomeController]
       val result: Future[Result] = controller.index().apply(FakeRequest())
@@ -32,4 +27,11 @@ class HomeControllerSpec extends PlaySpec with GuiceOneServerPerSuite with FakeE
     }
   }
 
+  override def fakeApplication(): Application = {
+    val ws = MockWS(sectionsEndPointGood)
+    new GuiceApplicationBuilder()
+      .configure("ny-times.api-key" -> expectedApiKey)
+      .overrides(bind[WSClient].toInstance(ws))
+      .build()
+  }
 }

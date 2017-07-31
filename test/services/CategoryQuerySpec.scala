@@ -1,16 +1,15 @@
 package services
 
-import testinghelpers.FakeEndpoints
 import mockws.MockWS
 import mockws.MockWS.Routes
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
+import testinghelpers.FakeEndpoints
 
-class CategoryQuerySpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndpoints with ScalaFutures {
+class CategoryQuerySpec extends PlaySpec with FakeEndpoints with ScalaFutures {
 
   "When app is configured and all sections have values in all categories, querying for categories" should {
     val viewedPairs = makeSectionCountPairings(1, sectionsNames).toMap

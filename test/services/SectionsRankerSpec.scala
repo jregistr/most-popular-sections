@@ -7,6 +7,7 @@ import models.Section
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
@@ -30,11 +31,6 @@ class SectionsRankerSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndp
   }
 
   "when app is well configured, asking for most popular" should {
-    val ws = MockWS(endPoints)
-    val app = new GuiceApplicationBuilder()
-      .configure("ny-times.api-key" -> expectedApiKey)
-      .overrides(bind[WSClient].toInstance(ws))
-      .build()
 
     "yield 8 values with Climate as the top" in {
       val ranker = app.injector.instanceOf[SectionsRanker]
@@ -57,4 +53,11 @@ class SectionsRankerSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndp
 
   }
 
+  override def fakeApplication(): Application = {
+    val ws = MockWS(endPoints)
+    new GuiceApplicationBuilder()
+      .configure("ny-times.api-key" -> expectedApiKey)
+      .overrides(bind[WSClient].toInstance(ws))
+      .build()
+  }
 }
