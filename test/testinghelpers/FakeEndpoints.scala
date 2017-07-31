@@ -1,4 +1,4 @@
-package helpers
+package testinghelpers
 
 import mockws.MockWS.Routes
 import play.api.libs.json.JsObject

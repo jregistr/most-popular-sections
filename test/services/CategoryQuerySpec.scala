@@ -1,4 +1,6 @@
-import helpers.FakeEndpoints
+package services
+
+import testinghelpers.FakeEndpoints
 import mockws.MockWS
 import mockws.MockWS.Routes
 import org.scalatest.concurrent.ScalaFutures
@@ -7,7 +9,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
-import services.{CategoryQuery, Constants}
 
 class CategoryQuerySpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndpoints with ScalaFutures {
 

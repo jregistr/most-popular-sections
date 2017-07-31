@@ -1,4 +1,4 @@
-package helpers
+package testinghelpers
 
 import com.github.javafaker.Faker
 import play.api.libs.json._

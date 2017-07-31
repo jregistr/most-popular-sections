@@ -1,11 +1,12 @@
-import helpers.FakeEndpoints
+package services
+
+import testinghelpers.FakeEndpoints
 import mockws.MockWS
+import mockws.MockWS.Routes
+import models.Section
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import services.{Constants, SectionsRanker}
-import mockws.MockWS.Routes
-import models.Section
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient

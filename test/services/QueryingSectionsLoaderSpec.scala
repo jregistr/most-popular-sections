@@ -1,11 +1,12 @@
-import helpers.FakeEndpoints
+package services
+
+import testinghelpers.FakeEndpoints
 import mockws.MockWS
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.{ApplicationLifecycle, bind}
 import play.api.libs.ws.WSClient
-import services.SectionsLoader
 
 class QueryingSectionsLoaderSpec extends PlaySpec with GuiceOneAppPerSuite with FakeEndpoints {
 
