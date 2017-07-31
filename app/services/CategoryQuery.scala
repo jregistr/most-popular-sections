@@ -67,6 +67,7 @@ class PerSectionCategoryQuery @Inject()(override protected val settingsRepo: Con
                                   timePeriod: Int): Future[(String, Int)] = {
     val queryUrl = mkUrl(apiBase, section, timePeriod)
     ws.url(queryUrl)
+        .withQueryStringParameters("api-key" -> settingsRepo.settings.apiKey)
       .withRequestTimeout(15.seconds) //15 second timeout
       .get().map(response => {
       response.status match {
@@ -92,6 +93,6 @@ class PerSectionCategoryQuery @Inject()(override protected val settingsRepo: Con
     * @return - A formatted query url to perform the request on.
     */
   private def mkUrl(apiBase: String, section: String, timePeriod: Int): String =
-    s"$apiBase/$section/$timePeriod.json?api-key=${settingsRepo.settings.apiKey}"
+    s"$apiBase/$section/$timePeriod.json"
 
 }
